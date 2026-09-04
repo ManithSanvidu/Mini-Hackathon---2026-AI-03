@@ -1,4 +1,20 @@
-require('dotenv').config();
+const path = require('path');
+require('dotenv').config({ path: path.join(__dirname, '.env') });
+
+// Validate essential environment variables
+if (!process.env.MONGO_URI) {
+  console.error("Error: Missing MONGO_URI in backend/.env");
+  process.exit(1);
+}
+if (!process.env.JWT_SECRET) {
+  console.error("Error: Missing JWT_SECRET in backend/.env");
+  process.exit(1);
+}
+if (!process.env.OFFICER_REGISTRATION_CODE) {
+  console.error("Error: Missing OFFICER_REGISTRATION_CODE in backend/.env");
+  process.exit(1);
+}
+
 const express = require('express');
 const cors = require('cors');
 const connectDB = require('./config/db');
@@ -19,6 +35,7 @@ app.get('/api/health', (req, res) => {
 
 // Mount Routes
 app.use('/api/faults', require('./routes/faults'));
+app.use('/api/auth', require('./routes/auth'));
 
 const PORT = process.env.PORT || 5000;
 

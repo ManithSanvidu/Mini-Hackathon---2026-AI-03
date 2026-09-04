@@ -1,8 +1,11 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { AuthProvider } from './context/AuthContext';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
+import ProtectedRoute from './components/ProtectedRoute';
 import Landing from './pages/Landing';
-
+import Login from './pages/Login';
+import Register from './pages/Register';
 import ReportForm from './components/ReportForm';
 
 // Placeholder component for pages that are not implemented yet
@@ -24,34 +27,44 @@ function PlaceholderPage({ title }) {
 
 function App() {
   return (
-    <Router>
-      <div className="flex flex-col min-h-screen relative">
-        <Navbar />
+    <AuthProvider>
+      <Router>
+        <div className="flex flex-col min-h-screen relative">
+          <Navbar />
 
-        <main className="flex-grow">
-          <Routes>
-            <Route path="/" element={<Landing />} />
+          <main className="flex-grow">
+            <Routes>
+              {/* Public routes */}
+              <Route path="/" element={<Landing />} />
+              <Route path="/login" element={<Login />} />
+              <Route path="/register" element={<Register />} />
 
-            <Route
-              path="/report"
-              element={<ReportForm />}
-            />
+              {/* Protected: any logged-in user */}
+              <Route
+                path="/report"
+                element={
+                  <ProtectedRoute>
+                    <ReportForm />
+                  </ProtectedRoute>
+                }
+              />
 
-            <Route
-              path="/dashboard"
-              element={<PlaceholderPage title="Live Dashboard" />}
-            />
+              {/* Protected: Officer only */}
+              <Route
+                path="/dashboard"
+                element={
+                  <ProtectedRoute allowedRoles={['Officer']}>
+                    <PlaceholderPage title="Live Dashboard" />
+                  </ProtectedRoute>
+                }
+              />
+            </Routes>
+          </main>
 
-            <Route
-              path="/login"
-              element={<PlaceholderPage title="Login" />}
-            />
-          </Routes>
-        </main>
-
-        <Footer />
-      </div>
-    </Router>
+          <Footer />
+        </div>
+      </Router>
+    </AuthProvider>
   );
 }
 

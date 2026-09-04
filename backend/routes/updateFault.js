@@ -2,11 +2,12 @@ const mongoose = require("mongoose");
 const express = require("express");
 const router = express.Router();
 const FaultReport = require("../models/FaultReport");
+const { authenticate, requireRole } = require("../middleware/auth");
 
 const ALLOWED_STATUSES = ["Pending", "In-Progress", "Repaired"];
 
-// PATCH /:id  — update the status of a fault report
-router.patch("/:id", async (req, res) => {
+// PATCH /:id  — update the status of a fault report (Officer only)
+router.patch("/:id", authenticate, requireRole("Officer"), async (req, res) => {
   const { id } = req.params;
   const { status } = req.body;
   if (!mongoose.Types.ObjectId.isValid(id)) {
