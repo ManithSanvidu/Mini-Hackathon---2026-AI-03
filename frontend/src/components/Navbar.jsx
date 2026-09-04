@@ -6,25 +6,25 @@ const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
-    <nav className="bg-white shadow-md sticky top-0 z-50">
+    <nav className="bg-black/80 backdrop-blur-md shadow-lg sticky top-0 z-50 border-b border-white/10">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16">
           <div className="flex items-center">
             <Link to="/" className="flex-shrink-0 flex items-center">
-              <span className="font-bold text-xl text-green-700">EleGuard</span>
+              <span className="font-serif font-bold text-2xl text-white tracking-wider">EleGuard</span>
             </Link>
           </div>
           <div className="hidden sm:flex sm:space-x-8 sm:items-center">
-            <Link to="/" className="text-gray-900 inline-flex items-center px-1 pt-1 border-b-2 border-transparent hover:border-green-500 hover:text-green-700 text-sm font-medium">
+            <Link to="/" className="text-gray-200 inline-flex items-center px-1 pt-1 border-b-2 border-transparent hover:border-white hover:text-white text-sm font-medium transition-colors">
               Home
             </Link>
-            <Link to="/report" className="text-gray-500 hover:text-gray-900 inline-flex items-center px-1 pt-1 border-b-2 border-transparent hover:border-gray-300 text-sm font-medium">
+            <Link to="/report" className="text-gray-200 hover:text-white inline-flex items-center px-1 pt-1 border-b-2 border-transparent hover:border-white text-sm font-medium transition-colors">
               Report
             </Link>
-            <Link to="/dashboard" className="text-gray-500 hover:text-gray-900 inline-flex items-center px-1 pt-1 border-b-2 border-transparent hover:border-gray-300 text-sm font-medium">
+            <Link to="/dashboard" className="text-gray-200 hover:text-white inline-flex items-center px-1 pt-1 border-b-2 border-transparent hover:border-white text-sm font-medium transition-colors">
               Dashboard
             </Link>
-            <Link to="/login" className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors">
+            <Link to="/login" className="bg-white hover:bg-gray-200 text-gray-900 px-5 py-2 rounded-full text-sm font-semibold transition-colors shadow-md">
               Login
             </Link>
           </div>

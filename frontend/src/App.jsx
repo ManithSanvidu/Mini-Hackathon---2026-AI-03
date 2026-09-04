@@ -3,6 +3,8 @@ import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import Landing from './pages/Landing';
 
+import ReportForm from './components/ReportForm';
+
 // Placeholder component for pages that are not implemented yet
 function PlaceholderPage({ title }) {
   return (
@@ -23,7 +25,7 @@ function PlaceholderPage({ title }) {
 function App() {
   return (
     <Router>
-      <div className="flex flex-col min-h-screen">
+      <div className="flex flex-col min-h-screen relative">
         <Navbar />
 
         <main className="flex-grow">
@@ -32,7 +34,7 @@ function App() {
 
             <Route
               path="/report"
-              element={<PlaceholderPage title="Report a Fault" />}
+              element={<ReportForm />}
             />
 
             <Route
