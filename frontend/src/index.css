@@ -1,12 +1,11 @@
 @import "tailwindcss";
 
-/* 
-  FenceGuard LK - Global Styles
-  Using Tailwind CSS v4 
-*/
-
-body {
-  margin: 0;
-  font-family: 'Inter', system-ui, -apple-system, sans-serif;
-  background-color: #0f172a; /* Fallback dark background */
+@layer base {
+  body {
+    margin: 0;
+    padding: 0;
+    background-color: #f9fafb;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
 }
