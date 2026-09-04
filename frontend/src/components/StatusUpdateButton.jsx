@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import axios from "axios";
 import { Loader2, CheckCircle2, AlertCircle, ChevronDown } from "lucide-react";
 
@@ -12,6 +12,8 @@ import { Loader2, CheckCircle2, AlertCircle, ChevronDown } from "lucide-react";
  */
 
 const STATUSES = ["Pending", "In-Progress", "Repaired"];
+
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
 
 const STATUS_STYLES = {
   Pending: {
@@ -35,6 +37,11 @@ export default function StatusUpdateButton({ faultId, currentStatus, onUpdated }
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(false);
 
+  useEffect(() => {
+    setSelected(currentStatus);
+  }, [currentStatus]);
+
+
   const handleSelect = async (newStatus) => {
     setOpen(false);
 
@@ -47,7 +54,7 @@ export default function StatusUpdateButton({ faultId, currentStatus, onUpdated }
 
     try {
       const { data } = await axios.patch(
-        `http://localhost:5000/api/faults/${faultId}`,
+        `${API_URL}/api/faults/${faultId}`,
         { status: newStatus }
       );
 
