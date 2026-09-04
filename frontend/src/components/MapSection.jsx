@@ -25,58 +25,46 @@ const districtCoordinates = {
   'Puttalam': [8.0408, 79.8394]
 };
 
-// 3. Fallback mock data in case backend is empty or fails
-const mockActiveReports = [
-  { _id: 'm1', fenceId: 'Galgamuwa Post 12', district: 'Kurunegala', damageType: 'Broken Wire', urgency: 'Critical', status: 'Pending' },
-  { _id: 'm2', fenceId: 'Ampara Reserve Line', district: 'Ampara', damageType: 'Fallen Post', urgency: 'Medium', status: 'In-Progress' },
-  { _id: 'm3', fenceId: 'Habarana Buffer', district: 'Anuradhapura', damageType: 'Power Failure', urgency: 'Critical', status: 'Pending' },
-  { _id: 'm4', fenceId: 'Yala Outskirts', district: 'Hambantota', damageType: 'Minor Damage', urgency: 'Low', status: 'Pending' }
-];
-
 const MapSection = () => {
   const [reports, setReports] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
+    const controller = new AbortController();
     let timer;
     const fetchReports = async () => {
       try {
-        const response = await api.get('/api/faults');
-        
-        // Filter logic: Render reports where status is NOT "Repaired" (case-insensitive)
-        const activeFaults = response.data.filter(report => 
-          report.status && report.status.toLowerCase() !== 'repaired'
-        );
-
-        if (activeFaults.length > 0) {
-          setReports(activeFaults);
-        } else {
-          // Fallback if empty array returned
-          setReports(mockActiveReports);
+        const response = await api.get('/api/faults/map', { signal: controller.signal });
+        if (!Array.isArray(response.data)) throw new Error('Invalid map response');
+        if (!controller.signal.aborted) {
+          setReports(response.data.filter(report => report && typeof report._id === 'string' && typeof report.status === 'string' && report.status.toLowerCase() !== 'repaired'));
+          setError(null);
         }
-      } catch (error) {
-        console.error('Error fetching fault reports for map:', error);
-        // Fallback if backend connection fails
-        setReports(mockActiveReports);
+      } catch {
+        if (!controller.signal.aborted) setError('Unable to refresh reports. Map data may be unavailable or out of date.');
       } finally {
-        setLoading(false);
-        // Refresh every 30 seconds
-        timer = setTimeout(fetchReports, 30000);
+        if (!controller.signal.aborted) {
+          setLoading(false);
+          timer = setTimeout(fetchReports, 30000);
+        }
       }
     };
-
     fetchReports();
-
-    return () => clearTimeout(timer);
+    return () => {
+      controller.abort();
+      clearTimeout(timer);
+    };
   }, []);
 
-  // Helper function to get coordinates with a slight random jitter
-  const getCoordinates = (district) => {
-    const baseCoords = districtCoordinates[district] || [7.8731, 80.7718]; // Default to Center of Sri Lanka
-    // Add slight jitter so multiple reports in the same district don't stack directly on top of each other
-    const jitterLat = (Math.random() - 0.5) * 0.04;
-    const jitterLng = (Math.random() - 0.5) * 0.04;
-    return [baseCoords[0] + jitterLat, baseCoords[1] + jitterLng];
+  // Stable offsets distinguish reports without moving markers on each refresh.
+  // Positions represent approximate district locations, not measured GPS points.
+  const getCoordinates = (district, id) => {
+    const base = districtCoordinates[district] || [7.8731, 80.7718];
+    let hash = 0;
+    for (const char of id) hash = (hash * 31 + char.charCodeAt(0)) >>> 0;
+    return [base[0] + ((hash % 101) / 100 - 0.5) * 0.04,
+      base[1] + ((Math.floor(hash / 101) % 101) / 100 - 0.5) * 0.04];
   };
 
   return (
@@ -90,6 +78,8 @@ const MapSection = () => {
           </p>
         </div>
 
+        {error && <p role="alert" className="mb-4 text-amber-200">{error}</p>}
+        {!loading && !error && reports.length === 0 && <p className="mb-4 text-gray-200">No active faults reported.</p>}
         {/* Map Container */}
         <div className="rounded-xl overflow-hidden shadow-inner border border-white/10 h-[500px] sm:h-[600px] w-full relative z-0">
           {loading && reports.length === 0 ? (
@@ -109,7 +99,7 @@ const MapSection = () => {
                 url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
               />
               {reports.map((report) => (
-                <Marker key={report._id} position={getCoordinates(report.district)}>
+                <Marker key={report._id} position={getCoordinates(report.district, report._id)}>
                   {/* 4. Marker Popups & UI Styling (dark-mode friendly) */}
                   <Popup className="custom-popup">
                     <div className="p-2 min-w-[200px] bg-gray-900 text-white rounded-lg -m-3 shadow-2xl border border-white/10">

@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import axios from 'axios';
+import api from '../services/api';
 import { AlertTriangle, ShieldCheck, Activity } from 'lucide-react';
 import MapSection from '../components/MapSection';
 
@@ -15,15 +15,11 @@ const Home = () => {
   useEffect(() => {
     const fetchStats = async () => {
       try {
-        const response = await axios.get('http://localhost:5001/api/stats');
+        const response = await api.get('/api/stats');
         setStats(response.data);
       } catch (error) {
-        console.error("Error fetching stats, using fallback data", error);
-        setStats({
-          activeFaults: 14,
-          fencesRepaired: 128,
-          monitoredFences: 45
-        });
+        console.error('Error fetching stats', error);
+        setStats({ activeFaults: 'Unavailable', fencesRepaired: 'Unavailable', monitoredFences: 'Unavailable' });
       } finally {
         setLoading(false);
       }
