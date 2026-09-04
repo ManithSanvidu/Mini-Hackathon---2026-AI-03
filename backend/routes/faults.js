@@ -53,4 +53,39 @@ router.post('/', async (req, res) => {
   }
 });
 
+// @route   GET /api/faults
+// @desc    Get all fault reports
+// @access  Public
+router.get('/', async (req, res) => {
+  try {
+    const { status, district, search } = req.query;
+    let query = {};
+    
+    if (status) query.status = status;
+    if (district) query.district = district;
+    if (search) {
+      query.fenceId = { $regex: search, $options: 'i' };
+    }
+
+    // Fetch reports from MongoDB and sort by createdAt descending (newest first)
+    const reports = await FaultReport.find(query).sort({ createdAt: -1 });
+
+    // Define urgency weight for sorting (Critical first, then Medium, then Low)
+    const urgencyWeight = { 'Critical': 3, 'Medium': 2, 'Low': 1 };
+
+    // Sort in memory by urgency (descending)
+    // Since javascript sort is stable in V8 (Node 11+), it will preserve the createdAt sorting for items with same urgency
+    reports.sort((a, b) => {
+      const weightA = urgencyWeight[a.urgency] || 0;
+      const weightB = urgencyWeight[b.urgency] || 0;
+      return weightB - weightA;
+    });
+
+    res.status(200).json(reports);
+  } catch (error) {
+    console.error('Error in GET /api/faults:', error);
+    res.status(500).json({ message: 'Internal Server Error' });
+  }
+});
+
 module.exports = router;
