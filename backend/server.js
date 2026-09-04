@@ -36,6 +36,7 @@ app.get('/api/health', (req, res) => {
 // Mount Routes
 app.use('/api/faults', require('./routes/faults'));
 app.use('/api/auth', require('./routes/auth'));
+app.use('/api/seed', require('./routes/seed'));
 
 const PORT = process.env.PORT || 5000;
 

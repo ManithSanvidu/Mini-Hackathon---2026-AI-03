@@ -7,6 +7,7 @@ import Landing from './pages/Landing';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import ReportForm from './components/ReportForm';
+import Dashboard from './pages/Dashboard';
 
 // Placeholder component for pages that are not implemented yet
 function PlaceholderPage({ title }) {
@@ -54,7 +55,7 @@ function App() {
                 path="/dashboard"
                 element={
                   <ProtectedRoute allowedRoles={['Officer']}>
-                    <PlaceholderPage title="Live Dashboard" />
+                    <Dashboard />
                   </ProtectedRoute>
                 }
               />

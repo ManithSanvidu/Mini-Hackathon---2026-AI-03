@@ -54,7 +54,7 @@ export default function StatusUpdateButton({ faultId, currentStatus, onUpdated }
 
     try {
       const { data } = await api.patch(
-        `/api/faults/${faultId}`,
+        `/api/faults/${faultId}/status`,
         { status: newStatus }
       );
 
