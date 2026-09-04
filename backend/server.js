@@ -1,7 +1,6 @@
 const path = require('path');
 require('dotenv').config({ path: path.join(__dirname, '.env') });
 const required = ['MONGO_URI', 'JWT_SECRET', 'OFFICER_REGISTRATION_CODE'];
-if (process.env.NODE_ENV === 'production') required.push('CORS_ORIGINS');
 for (const name of required) {
   if (!process.env[name]) {
     console.error('Missing required environment variable: ' + name);
