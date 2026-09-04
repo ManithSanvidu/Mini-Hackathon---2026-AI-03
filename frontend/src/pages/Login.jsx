@@ -37,8 +37,13 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-green-950 via-emerald-900 to-teal-900 px-4">
-      <div className="w-full max-w-md">
+    <div 
+      className="min-h-screen flex items-center justify-center relative bg-cover bg-center bg-no-repeat bg-fixed px-4"
+      style={{ backgroundImage: "url('https://images.unsplash.com/photo-1557050543-4d5f4e07ef46?q=80&w=2069&auto=format&fit=crop')" }}
+    >
+      <div className="absolute inset-0 bg-black/60"></div>
+      
+      <div className="w-full max-w-md relative z-10 my-12">
         {/* Logo */}
         <div className="flex items-center justify-center gap-3 mb-8">
           <div className="bg-emerald-500/20 p-3 rounded-xl text-emerald-400">
