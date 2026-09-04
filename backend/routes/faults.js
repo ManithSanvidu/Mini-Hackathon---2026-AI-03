@@ -58,11 +58,14 @@ router.post('/', async (req, res) => {
 // @access  Public
 router.get('/', async (req, res) => {
   try {
-    const { status, district } = req.query;
+    const { status, district, search } = req.query;
     let query = {};
     
     if (status) query.status = status;
     if (district) query.district = district;
+    if (search) {
+      query.fenceId = { $regex: search, $options: 'i' };
+    }
 
     // Fetch reports from MongoDB and sort by createdAt descending (newest first)
     const reports = await FaultReport.find(query).sort({ createdAt: -1 });
