@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
+import api from '../services/api';
 
 // Fix for default marker icon in leaflet with webpack/vite
 import iconUrl from 'leaflet/dist/images/marker-icon.png';
@@ -16,71 +17,108 @@ L.Icon.Default.mergeOptions({
   shadowUrl: shadowUrl,
 });
 
+// Approximate coordinates for major Sri Lankan districts
+const districtCoordinates = {
+  'Anuradhapura': [8.3114, 80.4037],
+  'Polonnaruwa': [7.9403, 81.0188],
+  'Ampara': [7.2912, 81.6724],
+  'Kurunegala': [7.4818, 80.3609],
+  'Hambantota': [6.1248, 81.1185],
+  'Monaragala': [6.8728, 81.3507],
+  'Trincomalee': [8.5874, 81.2152]
+};
+
 const MapSection = () => {
   const [reports, setReports] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const loadReports = () => {
-      const stored = localStorage.getItem('fence_reports');
-      if (stored) {
-        setReports(JSON.parse(stored));
+    const fetchReports = async () => {
+      try {
+        const response = await api.get('/api/faults');
+        // CRITICAL LOGIC: Filter out 'Repaired' status so only active faults display on the map
+        const activeFaults = response.data.filter(report => report.status !== 'Repaired');
+        setReports(activeFaults);
+      } catch (error) {
+        console.error('Error fetching fault reports for map:', error);
+      } finally {
+        setLoading(false);
       }
     };
 
-    loadReports();
-    // Listen for storage events (if changed in another tab) or custom events
-    window.addEventListener('storage', loadReports);
-    return () => window.removeEventListener('storage', loadReports);
+    fetchReports();
   }, []);
 
+  // Helper function to get coordinates with a slight random jitter
+  // so markers in the same district don't overlap completely
+  const getCoordinates = (district) => {
+    const baseCoords = districtCoordinates[district] || [7.8731, 80.7718]; // Default to center SL
+    const jitter = (Math.random() - 0.5) * 0.1; // roughly +/- 5-10km
+    return [baseCoords[0] + jitter, baseCoords[1] + jitter];
+  };
+
   return (
-    <section className="py-20 bg-gray-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center max-w-3xl mx-auto mb-12">
-          <h2 className="text-indigo-600 font-semibold tracking-wide uppercase text-sm mb-3">Live Map</h2>
-          <p className="mt-2 text-3xl leading-8 font-extrabold tracking-tight text-gray-900 sm:text-4xl">
-            Recent Fault Reports
-          </p>
-          <p className="mt-4 max-w-2xl text-xl text-gray-500 mx-auto">
-            View the latest crowdsourced reports of electric fence faults and elephant breaches across Sri Lanka.
+    <section className="relative py-20 px-4 sm:px-6 lg:px-8 bg-transparent">
+      <div className="w-full max-w-6xl mx-auto p-6 rounded-2xl bg-white/10 backdrop-blur-md border border-white/20 shadow-xl">
+        {/* Header inside the container */}
+        <div className="mb-6 flex flex-col items-center">
+          <h2 className="text-2xl sm:text-3xl font-serif font-bold tracking-wide text-white">Live Incident Map: Sri Lanka</h2>
+          <p className="mt-2 text-sm text-gray-300 font-sans">
+            Real-time locations of active electric fence faults and elephant breaches.
           </p>
         </div>
 
-        <div className="rounded-2xl overflow-hidden shadow-xl border border-gray-200 h-[600px] w-full relative z-0">
-          <MapContainer 
-            center={[7.8731, 80.7718]} 
-            zoom={7} 
-            scrollWheelZoom={false}
-            style={{ height: '100%', width: '100%' }}
-          >
-            <TileLayer
-              attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-              url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-            />
-            {reports.map((report) => (
-              <Marker key={report.id} position={[report.lat, report.lng]}>
-                <Popup>
-                  <div className="p-1">
-                    <h3 className="font-bold text-gray-900 mb-1 border-b pb-1">Fence ID: {report.fenceId}</h3>
-                    <p className="text-sm my-1"><span className="font-semibold">District:</span> {report.district}</p>
-                    <p className="text-sm my-1"><span className="font-semibold">Damage:</span> {report.damageType}</p>
-                    <p className="text-sm my-1 flex items-center">
-                      <span className="font-semibold mr-2">Urgency:</span> 
-                      <span className={`px-2 py-0.5 rounded text-xs font-bold text-white ${
-                        report.urgency === 'Critical' ? 'bg-rose-500' :
-                        report.urgency === 'Medium' ? 'bg-amber-500' : 'bg-emerald-500'
-                      }`}>
-                        {report.urgency}
-                      </span>
-                    </p>
-                    <p className="text-xs text-gray-500 mt-2">
-                      Reported: {new Date(report.timestamp).toLocaleString()}
-                    </p>
-                  </div>
-                </Popup>
-              </Marker>
-            ))}
-          </MapContainer>
+        {/* Map Container */}
+        <div className="rounded-xl overflow-hidden shadow-inner border border-white/10 h-[500px] sm:h-[600px] w-full relative z-0">
+          {loading ? (
+            <div className="absolute inset-0 bg-black/50 flex flex-col items-center justify-center z-20">
+              <div className="animate-spin rounded-full h-10 w-10 border-4 border-emerald-500 border-t-transparent mb-4"></div>
+              <p className="text-emerald-400 font-medium">Loading Active Faults...</p>
+            </div>
+          ) : (
+            <MapContainer 
+              center={[7.8731, 80.7718]} 
+              zoom={7} 
+              scrollWheelZoom={false}
+              style={{ height: '100%', width: '100%' }}
+            >
+              <TileLayer
+                attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+              />
+              {reports.map((report) => (
+                <Marker key={report._id} position={getCoordinates(report.district)}>
+                  <Popup className="custom-popup">
+                    <div className="p-2 min-w-[180px]">
+                      <h3 className="font-bold text-gray-900 mb-2 border-b border-gray-200 pb-1 text-sm">
+                        Fence ID: {report.fenceId || 'N/A'}
+                      </h3>
+                      <p className="text-xs my-1 text-gray-700">
+                        <span className="font-semibold text-gray-900">District:</span> {report.district}
+                      </p>
+                      <p className="text-xs my-1 text-gray-700">
+                        <span className="font-semibold text-gray-900">Damage:</span> {report.damageType}
+                      </p>
+                      <div className="mt-2 flex items-center justify-between">
+                        <span className={`px-2 py-0.5 rounded text-[10px] font-bold text-white uppercase tracking-wide ${
+                          report.urgency === 'Critical' ? 'bg-rose-500' :
+                          report.urgency === 'Medium' ? 'bg-amber-500' : 'bg-emerald-500'
+                        }`}>
+                          {report.urgency}
+                        </span>
+                        <span className={`px-2 py-0.5 rounded text-[10px] font-bold border uppercase tracking-wide ${
+                          report.status === 'Pending' ? 'bg-amber-50 text-amber-600 border-amber-200' :
+                          report.status === 'In-Progress' ? 'bg-blue-50 text-blue-600 border-blue-200' : 'bg-emerald-50 text-emerald-600 border-emerald-200'
+                        }`}>
+                          {report.status}
+                        </span>
+                      </div>
+                    </div>
+                  </Popup>
+                </Marker>
+              ))}
+            </MapContainer>
+          )}
         </div>
       </div>
     </section>

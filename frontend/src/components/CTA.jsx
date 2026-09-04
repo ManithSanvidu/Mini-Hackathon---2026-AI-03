@@ -1,28 +1,27 @@
+import { ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 const CTA = () => {
   return (
-    <section className="bg-gray-50 py-20 lg:py-32">
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-        <h2 className="text-3xl font-extrabold text-gray-900 sm:text-4xl mb-6">
-          Ready to safeguard your community?
-        </h2>
-        <p className="text-xl text-gray-600 mb-10 max-w-2xl mx-auto">
-          Join farmers and wildlife volunteers in crowdsourcing electric fence fault reporting. Help us prevent encroachments before they happen.
-        </p>
-        <div className="flex flex-col sm:flex-row justify-center gap-4">
-          <Link 
-            to="/report" 
-            className="inline-flex justify-center items-center px-8 py-4 border border-transparent text-lg font-semibold rounded-full text-white bg-indigo-600 hover:bg-indigo-700 shadow-md hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200"
-          >
-            Report a Fault
-          </Link>
-          <Link 
-            to="/dashboard" 
-            className="inline-flex justify-center items-center px-8 py-4 border border-gray-300 text-lg font-semibold rounded-full text-gray-700 bg-white hover:bg-gray-50 transition-all duration-200"
-          >
-            View Dashboard
-          </Link>
+    <section className="bg-transparent py-24 relative overflow-hidden">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+        <div className="bg-white/10 backdrop-blur-md rounded-3xl p-8 md:p-16 text-center border border-white/20 shadow-xl max-w-4xl mx-auto">
+          <h2 className="text-3xl font-extrabold text-white sm:text-4xl">
+            <span className="block">Ready to make a difference?</span>
+            <span className="block text-emerald-400 mt-2">Join FenceGuard LK today.</span>
+          </h2>
+          <p className="mt-4 text-lg leading-6 text-gray-300 max-w-2xl mx-auto">
+            Whether you're a local farmer spotting a broken wire or a wildlife officer coordinating repairs, your input saves lives.
+          </p>
+          <div className="mt-8 flex justify-center gap-4">
+            <Link
+              to="/report"
+              className="inline-flex items-center justify-center px-8 py-3.5 border border-transparent text-base font-medium rounded-full text-white bg-emerald-500 hover:bg-emerald-400 hover:-translate-y-0.5 transition-all shadow-lg"
+            >
+              Report a Fault
+              <ArrowRight className="ml-2 h-5 w-5" />
+            </Link>
+          </div>
         </div>
       </div>
     </section>
