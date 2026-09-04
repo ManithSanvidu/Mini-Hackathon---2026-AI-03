@@ -6,7 +6,7 @@ export function AuthProvider({ children }) {
   const [user, setUser] = useState(() => {
     try {
       const stored = localStorage.getItem("fg_user");
-      return stored ? JSON.parse(stored) : null;
+      return stored && localStorage.getItem('fg_token') ? JSON.parse(stored) : null;
     } catch {
       return null;
     }
@@ -21,6 +21,7 @@ export function AuthProvider({ children }) {
 
   /** Clears session */
   const logout = () => {
+    localStorage.removeItem('isAuthenticated');
     localStorage.removeItem("fg_token");
     localStorage.removeItem("fg_user");
     setUser(null);

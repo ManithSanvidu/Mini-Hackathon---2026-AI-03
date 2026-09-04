@@ -24,13 +24,9 @@ export default function Login() {
       // Attempt backend auth first
       const { data } = await api.post("/api/auth/login", form);
       if (login) login(data.user, data.token);
-      localStorage.setItem('isAuthenticated', 'true');
       navigate(data.user?.role === "Officer" ? "/dashboard" : "/");
     } catch (err) {
-      console.warn("Backend auth failed, falling back to local session for hackathon evaluation.");
-      // Fallback: If auth fails or is incomplete, just log them in locally so evaluators aren't blocked
-      localStorage.setItem('isAuthenticated', 'true');
-      navigate("/dashboard");
+      setError(err.response?.data?.message || "Unable to sign in. Please try again.");
     } finally {
       setLoading(false);
     }

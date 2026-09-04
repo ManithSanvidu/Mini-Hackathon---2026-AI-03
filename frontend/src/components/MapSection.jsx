@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
@@ -31,31 +31,36 @@ const districtCoordinates = {
 const MapSection = () => {
   const [reports, setReports] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
+    const controller = new AbortController();
+    let timer;
     const fetchReports = async () => {
       try {
-        const response = await api.get('/api/faults');
-        // CRITICAL LOGIC: Filter out 'Repaired' status so only active faults display on the map
-        const activeFaults = response.data.filter(report => report.status !== 'Repaired');
-        setReports(activeFaults);
-      } catch (error) {
-        console.error('Error fetching fault reports for map:', error);
+        const response = await api.get('/api/faults/map', { signal: controller.signal });
+        if (!controller.signal.aborted) {
+          setReports(response.data);
+          setError(null);
+        }
+      } catch {
+        if (!controller.signal.aborted) setError('Unable to refresh reports. Map data may be unavailable or out of date.');
       } finally {
-        setLoading(false);
+        if (!controller.signal.aborted) {
+          setLoading(false);
+          timer = setTimeout(fetchReports, 30000);
+        }
       }
     };
-
     fetchReports();
+    return () => {
+      controller.abort();
+      clearTimeout(timer);
+    };
   }, []);
 
-  // Helper function to get coordinates with a slight random jitter
-  // so markers in the same district don't overlap completely
-  const getCoordinates = (district) => {
-    const baseCoords = districtCoordinates[district] || [7.8731, 80.7718]; // Default to center SL
-    const jitter = (Math.random() - 0.5) * 0.1; // roughly +/- 5-10km
-    return [baseCoords[0] + jitter, baseCoords[1] + jitter];
-  };
+  // District centers are approximate, not measured incident coordinates.
+  const getCoordinates = district => districtCoordinates[district] || [7.8731, 80.7718];
 
   return (
     <section className="relative py-20 px-4 sm:px-6 lg:px-8 bg-transparent">
@@ -64,10 +69,12 @@ const MapSection = () => {
         <div className="mb-6 flex flex-col items-center">
           <h2 className="text-2xl sm:text-3xl font-serif font-bold tracking-wide text-white">Live Incident Map: Sri Lanka</h2>
           <p className="mt-2 text-sm text-gray-300 font-sans">
-            Real-time locations of active electric fence faults and elephant breaches.
+            Active reports by approximate district location. Updated every 30 seconds.
           </p>
         </div>
 
+        {error && <p role="alert" className="mb-4 text-amber-200">{error}</p>}
+        {!loading && !error && reports.length === 0 && <p className="mb-4 text-gray-200">No active faults reported.</p>}
         {/* Map Container */}
         <div className="rounded-xl overflow-hidden shadow-inner border border-white/10 h-[500px] sm:h-[600px] w-full relative z-0">
           {loading ? (
