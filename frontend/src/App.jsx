@@ -5,6 +5,8 @@ import Landing from './pages/Landing';
 
 import ReportForm from './components/ReportForm';
 
+import Dashboard from './pages/Dashboard';
+
 // Placeholder component for pages that are not implemented yet
 function PlaceholderPage({ title }) {
   return (
@@ -39,7 +41,7 @@ function App() {
 
             <Route
               path="/dashboard"
-              element={<PlaceholderPage title="Live Dashboard" />}
+              element={<Dashboard />}
             />
 
             <Route
