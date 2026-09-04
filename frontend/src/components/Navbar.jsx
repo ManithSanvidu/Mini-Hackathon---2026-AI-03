@@ -1,61 +1,100 @@
-import { Link } from 'react-router-dom';
-import { Menu, X } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { Link, useLocation } from 'react-router-dom';
+import { Menu, X, ShieldAlert } from 'lucide-react';
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+  const location = useLocation();
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 20);
+    };
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  const navLinks = [
+    { name: 'Home', path: '/' },
+    { name: 'Report Fault', path: '/report' },
+    { name: 'Dashboard', path: '/dashboard' },
+  ];
 
   return (
-    <nav className="bg-white shadow-md sticky top-0 z-50">
+    <nav className={`sticky top-0 z-50 w-full transition-all duration-300 bg-white ${scrolled ? 'shadow-md py-3' : 'shadow-sm py-4'}`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between h-16">
-          <div className="flex items-center">
-            <Link to="/" className="flex-shrink-0 flex items-center">
-              <span className="font-bold text-xl text-green-700">EleGuard</span>
-            </Link>
+        <div className="flex justify-between items-center">
+          {/* Logo */}
+          <Link to="/" className="flex items-center gap-2 group">
+            <div className="bg-indigo-600 text-white p-2 rounded-lg group-hover:bg-indigo-700 transition-colors">
+              <ShieldAlert className="h-6 w-6" />
+            </div>
+            <span className="font-bold text-2xl text-gray-900 tracking-tight">FenceGuard LK</span>
+          </Link>
+
+          {/* Desktop Nav Links */}
+          <div className="hidden md:flex space-x-8 items-center">
+            {navLinks.map((link) => {
+              const isActive = location.pathname === link.path;
+              return (
+                <Link
+                  key={link.name}
+                  to={link.path}
+                  className={`text-sm font-medium transition-colors hover:text-indigo-600 ${
+                    isActive ? 'text-indigo-600 font-semibold' : 'text-gray-600'
+                  }`}
+                >
+                  {link.name}
+                </Link>
+              );
+            })}
           </div>
-          <div className="hidden sm:flex sm:space-x-8 sm:items-center">
-            <Link to="/" className="text-gray-900 inline-flex items-center px-1 pt-1 border-b-2 border-transparent hover:border-green-500 hover:text-green-700 text-sm font-medium">
-              Home
-            </Link>
-            <Link to="/report" className="text-gray-500 hover:text-gray-900 inline-flex items-center px-1 pt-1 border-b-2 border-transparent hover:border-gray-300 text-sm font-medium">
-              Report
-            </Link>
-            <Link to="/dashboard" className="text-gray-500 hover:text-gray-900 inline-flex items-center px-1 pt-1 border-b-2 border-transparent hover:border-gray-300 text-sm font-medium">
-              Dashboard
-            </Link>
-            <Link to="/login" className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors">
+
+          {/* Desktop Auth Buttons */}
+          <div className="hidden md:flex items-center space-x-4">
+            <Link to="/login" className="bg-indigo-600 text-white px-6 py-2.5 rounded-full text-sm font-medium hover:bg-indigo-700 hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200">
               Login
             </Link>
           </div>
-          <div className="-mr-2 flex items-center sm:hidden">
+
+          {/* Mobile menu button */}
+          <div className="flex items-center md:hidden">
             <button
               onClick={() => setIsOpen(!isOpen)}
-              className="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-green-500"
+              className="text-gray-600 hover:text-gray-900 focus:outline-none p-2 rounded-md hover:bg-gray-100 transition-colors"
             >
               <span className="sr-only">Open main menu</span>
-              {isOpen ? <X className="block h-6 w-6" /> : <Menu className="block h-6 w-6" />}
+              {isOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
             </button>
           </div>
         </div>
       </div>
 
-      {/* Mobile menu */}
+      {/* Mobile Menu */}
       {isOpen && (
-        <div className="sm:hidden">
-          <div className="pt-2 pb-3 space-y-1">
-            <Link to="/" className="bg-green-50 border-green-500 text-green-700 block pl-3 pr-4 py-2 border-l-4 text-base font-medium" onClick={() => setIsOpen(false)}>
-              Home
-            </Link>
-            <Link to="/report" className="border-transparent text-gray-500 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-700 block pl-3 pr-4 py-2 border-l-4 text-base font-medium" onClick={() => setIsOpen(false)}>
-              Report
-            </Link>
-            <Link to="/dashboard" className="border-transparent text-gray-500 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-700 block pl-3 pr-4 py-2 border-l-4 text-base font-medium" onClick={() => setIsOpen(false)}>
-              Dashboard
-            </Link>
-            <Link to="/login" className="border-transparent text-gray-500 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-700 block pl-3 pr-4 py-2 border-l-4 text-base font-medium" onClick={() => setIsOpen(false)}>
-              Login
-            </Link>
+        <div className="md:hidden bg-white border-t border-gray-100 absolute w-full shadow-xl">
+          <div className="px-4 pt-2 pb-6 space-y-1 flex flex-col">
+            {navLinks.map((link) => {
+              const isActive = location.pathname === link.path;
+              return (
+                <Link
+                  key={link.name}
+                  to={link.path}
+                  onClick={() => setIsOpen(false)}
+                  className={`block px-3 py-3 rounded-md text-base font-medium transition-colors ${
+                    isActive ? 'text-indigo-600 bg-indigo-50' : 'text-gray-700 hover:text-indigo-600 hover:bg-gray-50'
+                  }`}
+                >
+                  {link.name}
+                </Link>
+              );
+            })}
+            <div className="border-t border-gray-100 my-4 pt-4 px-3">
+              <Link to="/login" onClick={() => setIsOpen(false)} className="block w-full text-center px-4 py-3 bg-indigo-600 text-white rounded-lg font-medium hover:bg-indigo-700 transition-colors shadow-md">
+                Login
+              </Link>
+            </div>
           </div>
         </div>
       )}
