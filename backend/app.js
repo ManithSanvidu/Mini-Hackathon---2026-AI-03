@@ -9,6 +9,11 @@ app.use(express.json());
 // Vercel invokes this exported app directly instead of starting server.js.
 // CORS runs first so browser clients can read startup failure responses.
 if (process.env.VERCEL) app.use(require('./middleware/vercelDatabase'));
+
+app.get('/', (req, res) => {
+  res.status(200).json({ message: 'FenceGuard API is running successfully.' });
+});
+
 app.get('/api/health', (req, res) => {
   const connected = mongoose.connection.readyState === 1;
   res.status(connected ? 200 : 503).json({ status: connected ? 'ok' : 'unavailable', db: connected ? 'connected' : 'disconnected' });
