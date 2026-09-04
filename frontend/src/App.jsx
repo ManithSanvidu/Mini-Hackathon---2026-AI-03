@@ -1,7 +1,9 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
-import Landing from './pages/Landing';
+import Home from './pages/Home';
+
+import ReportForm from './components/ReportForm';
 
 // Placeholder component for pages that are not implemented yet
 function PlaceholderPage({ title }) {
@@ -23,16 +25,16 @@ function PlaceholderPage({ title }) {
 function App() {
   return (
     <Router>
-      <div className="flex flex-col min-h-screen">
+      <div className="flex flex-col min-h-screen relative font-sans">
         <Navbar />
 
-        <main className="flex-grow">
+        <main className="flex-grow flex flex-col">
           <Routes>
-            <Route path="/" element={<Landing />} />
+            <Route path="/" element={<Home />} />
 
             <Route
               path="/report"
-              element={<PlaceholderPage title="Report a Fault" />}
+              element={<ReportForm />}
             />
 
             <Route
