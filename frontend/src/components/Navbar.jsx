@@ -1,40 +1,47 @@
 import { Link } from 'react-router-dom';
-import { Menu, X } from 'lucide-react';
+import { Menu, X, ShieldAlert } from 'lucide-react';
 import { useState } from 'react';
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
-    <nav className="bg-black/80 backdrop-blur-md shadow-lg sticky top-0 z-50 border-b border-white/10">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between h-16">
+    <nav className="fixed top-0 left-0 right-0 z-50 bg-black/40 backdrop-blur-md border-b border-white/10 px-6 py-4">
+      <div className="max-w-7xl mx-auto">
+        <div className="flex justify-between items-center h-10">
           <div className="flex items-center">
-            <Link to="/" className="flex-shrink-0 flex items-center">
-              <span className="font-serif font-bold text-2xl text-white tracking-wider">EleGuard</span>
+            <Link to="/" className="flex items-center gap-2 group">
+              <div className="bg-emerald-500/20 p-2 rounded-lg text-emerald-400 group-hover:bg-emerald-500/30 transition">
+                <ShieldAlert size={24} />
+              </div>
+              <span className="font-serif font-bold text-2xl text-white tracking-wide">EleGuard LK</span>
             </Link>
           </div>
-          <div className="hidden sm:flex sm:space-x-8 sm:items-center">
-            <Link to="/" className="text-gray-200 inline-flex items-center px-1 pt-1 border-b-2 border-transparent hover:border-white hover:text-white text-sm font-medium transition-colors">
+          
+          {/* Desktop Navigation */}
+          <div className="hidden md:flex md:items-center md:space-x-8">
+            <Link to="/" className="text-white/80 hover:text-white transition font-medium text-sm">
               Home
             </Link>
-            <Link to="/report" className="text-gray-200 hover:text-white inline-flex items-center px-1 pt-1 border-b-2 border-transparent hover:border-white text-sm font-medium transition-colors">
-              Report
+            <Link to="/report" className="text-white/80 hover:text-white transition font-medium text-sm">
+              Report a Fault
             </Link>
-            <Link to="/dashboard" className="text-gray-200 hover:text-white inline-flex items-center px-1 pt-1 border-b-2 border-transparent hover:border-white text-sm font-medium transition-colors">
-              Dashboard
+            <Link to="/dashboard" className="text-white/80 hover:text-white transition font-medium text-sm">
+              Officer Dashboard
             </Link>
-            <Link to="/login" className="bg-white hover:bg-gray-200 text-gray-900 px-5 py-2 rounded-full text-sm font-semibold transition-colors shadow-md">
+            <Link to="/login" className="bg-white/10 hover:bg-white/20 border border-white/20 text-white px-5 py-2.5 rounded-lg text-sm font-semibold transition backdrop-blur-sm shadow-lg">
               Login
             </Link>
           </div>
-          <div className="-mr-2 flex items-center sm:hidden">
+
+          {/* Mobile menu button */}
+          <div className="flex items-center md:hidden">
             <button
               onClick={() => setIsOpen(!isOpen)}
-              className="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-green-500"
+              className="text-white/80 hover:text-white p-2 rounded-lg hover:bg-white/10 transition focus:outline-none"
             >
               <span className="sr-only">Open main menu</span>
-              {isOpen ? <X className="block h-6 w-6" /> : <Menu className="block h-6 w-6" />}
+              {isOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
             </button>
           </div>
         </div>
@@ -42,18 +49,18 @@ const Navbar = () => {
 
       {/* Mobile menu */}
       {isOpen && (
-        <div className="sm:hidden">
-          <div className="pt-2 pb-3 space-y-1">
-            <Link to="/" className="bg-green-50 border-green-500 text-green-700 block pl-3 pr-4 py-2 border-l-4 text-base font-medium" onClick={() => setIsOpen(false)}>
+        <div className="md:hidden mt-4 pb-2 bg-black/60 backdrop-blur-lg rounded-xl border border-white/10 overflow-hidden shadow-2xl">
+          <div className="flex flex-col">
+            <Link to="/" className="text-white/90 hover:bg-white/10 px-6 py-4 border-b border-white/5 font-medium transition" onClick={() => setIsOpen(false)}>
               Home
             </Link>
-            <Link to="/report" className="border-transparent text-gray-500 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-700 block pl-3 pr-4 py-2 border-l-4 text-base font-medium" onClick={() => setIsOpen(false)}>
-              Report
+            <Link to="/report" className="text-white/90 hover:bg-white/10 px-6 py-4 border-b border-white/5 font-medium transition" onClick={() => setIsOpen(false)}>
+              Report a Fault
             </Link>
-            <Link to="/dashboard" className="border-transparent text-gray-500 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-700 block pl-3 pr-4 py-2 border-l-4 text-base font-medium" onClick={() => setIsOpen(false)}>
-              Dashboard
+            <Link to="/dashboard" className="text-white/90 hover:bg-white/10 px-6 py-4 border-b border-white/5 font-medium transition" onClick={() => setIsOpen(false)}>
+              Officer Dashboard
             </Link>
-            <Link to="/login" className="border-transparent text-gray-500 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-700 block pl-3 pr-4 py-2 border-l-4 text-base font-medium" onClick={() => setIsOpen(false)}>
+            <Link to="/login" className="text-emerald-400 hover:bg-white/10 px-6 py-4 font-semibold transition" onClick={() => setIsOpen(false)}>
               Login
             </Link>
           </div>

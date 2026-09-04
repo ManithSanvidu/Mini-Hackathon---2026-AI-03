@@ -1,33 +1,14 @@
-import { Link } from 'react-router-dom';
-
 const Footer = () => {
   return (
-    <footer className="bg-gray-900 text-white py-12">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          <div>
-            <h3 className="text-xl font-bold mb-4">EleGuard</h3>
-            <p className="text-gray-400">
-              Protecting communities and wildlife through innovative electric fence monitoring and maintenance in Sri Lanka.
-            </p>
-          </div>
-          <div>
-            <h3 className="text-lg font-semibold mb-4">Quick Links</h3>
-            <ul className="space-y-2">
-              <li><Link to="/" className="text-gray-400 hover:text-white transition">Home</Link></li>
-              <li><Link to="/report" className="text-gray-400 hover:text-white transition">Report an Issue</Link></li>
-              <li><Link to="/dashboard" className="text-gray-400 hover:text-white transition">Dashboard</Link></li>
-            </ul>
-          </div>
-          <div>
-            <h3 className="text-lg font-semibold mb-4">Contact Us</h3>
-            <p className="text-gray-400 mb-2">Email: info@eleguard.lk</p>
-            <p className="text-gray-400">Phone: +94 11 234 5678</p>
-          </div>
-        </div>
-        <div className="border-t border-gray-800 mt-8 pt-8 text-center text-gray-500">
-          <p>&copy; {new Date().getFullYear()} EleGuard. All rights reserved.</p>
-        </div>
+    <footer className="bg-black/90 text-gray-400 py-8 border-t border-white/10 text-center text-sm">
+      <div className="max-w-7xl mx-auto px-6">
+        <p className="mb-2">
+          &copy; {new Date().getFullYear()} EleGuard LK. All rights reserved.
+        </p>
+        <p className="font-medium text-gray-300">
+          Department of Wildlife Conservation Emergency Hotline:{' '}
+          <span className="text-emerald-400 font-bold ml-1">1992</span>
+        </p>
       </div>
     </footer>
   );

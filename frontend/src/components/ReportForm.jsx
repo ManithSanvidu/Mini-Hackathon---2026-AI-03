@@ -85,7 +85,7 @@ const ReportForm = () => {
         phone: formData.phone
       };
 
-      const response = await axios.post('http://localhost:5000/api/faults', payload, {
+      const response = await axios.post('http://localhost:5001/api/faults', payload, {
         headers: { 'Content-Type': 'application/json' }
       });
 
@@ -106,7 +106,7 @@ const ReportForm = () => {
       console.error('Submission error:', error);
       setSubmitStatus({
         type: 'error',
-        message: error.response?.data?.error || 'Failed to submit report. Please check your connection and try again.'
+        message: error.response?.data?.message || 'Failed to submit report. Please check your connection and try again.'
       });
     } finally {
       setIsSubmitting(false);
@@ -115,55 +115,52 @@ const ReportForm = () => {
 
   return (
     <div 
-      className="min-h-screen relative flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 bg-cover bg-center bg-no-repeat bg-fixed"
+      className="min-h-screen relative flex items-center justify-center pt-28 pb-12 px-4 sm:px-6 lg:px-8 bg-cover bg-center bg-no-repeat bg-fixed"
       style={{ backgroundImage: "url('https://images.unsplash.com/photo-1557050543-4d5f4e07ef46?q=80&w=2069&auto=format&fit=crop')" }}
     >
-      {/* Dark overlay for text readability */}
-      <div className="absolute inset-0 bg-black/50 backdrop-blur-[2px]"></div>
+      <div className="absolute inset-0 bg-black/50"></div>
 
-      <div className="relative z-10 max-w-3xl w-full p-8 md:p-10 bg-white/10 backdrop-blur-md rounded-2xl shadow-2xl border border-white/20">
-        <div className="flex items-center gap-4 mb-8 pb-6 border-b border-white/20">
-          <div className="bg-white/20 p-3 rounded-xl text-white shadow-sm backdrop-blur-sm border border-white/10">
+      <div className="relative z-10 max-w-xl mx-auto my-12 p-8 rounded-2xl bg-black/65 backdrop-blur-lg border border-white/20 shadow-2xl text-white w-full">
+        <div className="flex items-center gap-4 mb-6 pb-6 border-b border-white/20">
+          <div className="bg-white/10 p-3 rounded-xl text-emerald-400 shadow-sm border border-white/10">
             <ShieldAlert size={32} />
           </div>
           <div>
-            <h2 className="text-3xl font-serif text-white tracking-wide">Report a Fault</h2>
-            <p className="text-gray-200 text-sm mt-1.5 font-sans font-light tracking-wide">Help the DWC manage the Human-Elephant Conflict by reporting damaged fences.</p>
+            <h2 className="text-3xl font-serif tracking-wide text-white">Report a Fence Fault</h2>
+            <p className="text-gray-300 text-sm mt-1.5 font-sans font-light">This alerts the DWC quick-response units immediately.</p>
           </div>
         </div>
 
         {submitStatus && submitStatus.type === 'success' && (
-          <div className="mb-8 p-4 bg-white/20 text-white rounded-lg flex items-center gap-3 border border-green-400/50 shadow-sm backdrop-blur-md">
-            <CheckCircle2 className="flex-shrink-0 text-green-300" size={24} />
+          <div className="mb-6 p-4 bg-emerald-500/20 text-white rounded-lg flex items-center gap-3 border border-emerald-400/50 shadow-sm backdrop-blur-md">
+            <CheckCircle2 className="flex-shrink-0 text-emerald-400" size={24} />
             <div>
-              <h4 className="font-semibold text-green-50 tracking-wide">Success</h4>
-              <p className="text-sm mt-0.5 text-green-100/90">{submitStatus.message}</p>
+              <h4 className="font-semibold tracking-wide">Success</h4>
+              <p className="text-sm mt-0.5 text-emerald-100">{submitStatus.message}</p>
             </div>
           </div>
         )}
 
         {submitStatus && submitStatus.type === 'error' && (
-          <div className="mb-8 p-4 bg-white/10 text-white rounded-lg flex items-center gap-3 border border-red-500/50 shadow-sm backdrop-blur-md">
-            <AlertTriangle className="flex-shrink-0 text-red-400" size={24} />
+          <div className="mb-6 p-4 bg-rose-500/20 text-white rounded-lg flex items-center gap-3 border border-rose-500/50 shadow-sm backdrop-blur-md">
+            <AlertTriangle className="flex-shrink-0 text-rose-400" size={24} />
             <div>
-              <h4 className="font-semibold text-red-100 tracking-wide">Submission Failed</h4>
-              <p className="text-sm mt-0.5 text-red-200/90">{submitStatus.message}</p>
+              <h4 className="font-semibold tracking-wide">Submission Failed</h4>
+              <p className="text-sm mt-0.5 text-rose-100">{submitStatus.message}</p>
             </div>
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="space-y-8 font-sans">
+        <form onSubmit={handleSubmit} className="space-y-6 font-sans">
           
-          {/* Row 1: Fence ID & District */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {/* Fence ID / Landmark */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
             <div>
-              <label className="block text-sm font-medium text-gray-200 mb-2 tracking-wide">
-                Fence ID / Landmark <span className="text-red-400">*</span>
+              <label className="text-sm font-medium text-gray-200 mb-1 block">
+                Fence ID / Landmark <span className="text-rose-400">*</span>
               </label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-white/50">
-                  <Hash size={18} />
+                  <Hash size={16} />
                 </div>
                 <input
                   type="text"
@@ -171,28 +168,27 @@ const ReportForm = () => {
                   value={formData.fenceId}
                   onChange={handleChange}
                   required
-                  placeholder="e.g., Post 42, Anuradhapura border"
-                  className="pl-10 w-full p-3 bg-white/10 border border-white/20 text-white placeholder-white/40 rounded-lg focus:ring-2 focus:ring-white/50 focus:border-white transition-all outline-none backdrop-blur-sm"
+                  placeholder="e.g., Post 42"
+                  className="pl-9 w-full px-4 py-2.5 rounded-lg bg-white/10 border border-white/20 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:border-transparent transition-all"
                 />
               </div>
             </div>
 
-            {/* District Select */}
             <div>
-              <label className="block text-sm font-medium text-gray-200 mb-2 tracking-wide">
-                District <span className="text-red-400">*</span>
+              <label className="text-sm font-medium text-gray-200 mb-1 block">
+                District <span className="text-rose-400">*</span>
               </label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-white/50">
-                  <MapPin size={18} />
+                  <MapPin size={16} />
                 </div>
                 <select
                   name="district"
                   value={formData.district}
                   onChange={handleChange}
-                  className={`pl-10 w-full p-3 bg-white/10 border text-white rounded-lg focus:ring-2 focus:ring-white/50 focus:border-white transition-all outline-none backdrop-blur-sm appearance-none [&>option]:text-gray-900 ${errors.district ? 'border-red-400 ring-1 ring-red-400' : 'border-white/20'}`}
+                  className={`pl-9 w-full px-4 py-2.5 rounded-lg bg-white/10 border text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:border-transparent appearance-none transition-all [&>option]:bg-gray-800 [&>option]:text-white ${errors.district ? 'border-rose-400 ring-1 ring-rose-400' : 'border-white/20'}`}
                 >
-                  <option value="" className="text-gray-500">Select a District...</option>
+                  <option value="" className="text-gray-400">Select...</option>
                   <option value="Anuradhapura">Anuradhapura</option>
                   <option value="Polonnaruwa">Polonnaruwa</option>
                   <option value="Ampara">Ampara</option>
@@ -204,27 +200,23 @@ const ReportForm = () => {
                 </select>
               </div>
               {errors.district && (
-                <p className="text-red-400 text-sm mt-2 font-medium flex items-center gap-1.5 bg-black/20 p-2 rounded backdrop-blur-sm border border-red-500/20">
-                  <AlertTriangle size={14} /> {errors.district}
-                </p>
+                <p className="text-rose-400 text-xs mt-1">{errors.district}</p>
               )}
             </div>
           </div>
 
-          {/* Row 2: Damage Type & Phone */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {/* Damage Type Select */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
             <div>
-              <label className="block text-sm font-medium text-gray-200 mb-2 tracking-wide">
-                Damage Type <span className="text-red-400">*</span>
+              <label className="text-sm font-medium text-gray-200 mb-1 block">
+                Damage Type <span className="text-rose-400">*</span>
               </label>
               <select
                 name="damageType"
                 value={formData.damageType}
                 onChange={handleChange}
-                className={`w-full p-3 bg-white/10 border text-white rounded-lg focus:ring-2 focus:ring-white/50 focus:border-white transition-all outline-none backdrop-blur-sm appearance-none [&>option]:text-gray-900 ${errors.damageType ? 'border-red-400 ring-1 ring-red-400' : 'border-white/20'}`}
+                className={`w-full px-4 py-2.5 rounded-lg bg-white/10 border text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:border-transparent appearance-none transition-all [&>option]:bg-gray-800 [&>option]:text-white ${errors.damageType ? 'border-rose-400 ring-1 ring-rose-400' : 'border-white/20'}`}
               >
-                <option value="" className="text-gray-500">Select type of damage...</option>
+                <option value="" className="text-gray-400">Select damage...</option>
                 <option value="Broken Wire">Broken Wire</option>
                 <option value="Fallen Post">Fallen Post</option>
                 <option value="Power Failure">Power Failure</option>
@@ -233,20 +225,17 @@ const ReportForm = () => {
                 <option value="Other">Other</option>
               </select>
               {errors.damageType && (
-                <p className="text-red-400 text-sm mt-2 font-medium flex items-center gap-1.5 bg-black/20 p-2 rounded backdrop-blur-sm border border-red-500/20">
-                  <AlertTriangle size={14} /> {errors.damageType}
-                </p>
+                <p className="text-rose-400 text-xs mt-1">{errors.damageType}</p>
               )}
             </div>
 
-            {/* Phone Number */}
             <div>
-              <label className="block text-sm font-medium text-gray-200 mb-2 tracking-wide">
-                Reporter Phone <span className="text-red-400">*</span>
+              <label className="text-sm font-medium text-gray-200 mb-1 block">
+                Reporter Phone <span className="text-rose-400">*</span>
               </label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-white/50">
-                  <Phone size={18} />
+                  <Phone size={16} />
                 </div>
                 <input
                   type="tel"
@@ -254,75 +243,74 @@ const ReportForm = () => {
                   value={formData.phone}
                   onChange={handleChange}
                   placeholder="07XXXXXXXX"
-                  className={`pl-10 w-full p-3 bg-white/10 border text-white placeholder-white/40 rounded-lg focus:ring-2 focus:ring-white/50 focus:border-white transition-all outline-none backdrop-blur-sm ${errors.phone ? 'border-red-400 ring-1 ring-red-400' : 'border-white/20'}`}
+                  className={`pl-9 w-full px-4 py-2.5 rounded-lg bg-white/10 border text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:border-transparent transition-all ${errors.phone ? 'border-rose-400 ring-1 ring-rose-400' : 'border-white/20'}`}
                 />
               </div>
               {errors.phone && (
-                <p className="text-red-400 text-sm mt-2 font-medium flex items-center gap-1.5 bg-black/20 p-2 rounded backdrop-blur-sm border border-red-500/20">
-                  <AlertTriangle size={14} /> {errors.phone}
-                </p>
+                <p className="text-rose-400 text-xs mt-1">{errors.phone}</p>
               )}
             </div>
           </div>
 
-          {/* Urgency Level - Radio Buttons */}
           <div>
-            <label className="block text-sm font-medium text-gray-200 mb-3 tracking-wide">
-              Urgency Level <span className="text-red-400">*</span>
+            <label className="text-sm font-medium text-gray-200 mb-2 block">
+              Urgency Level <span className="text-rose-400">*</span>
             </label>
-            <div className="flex flex-col sm:flex-row gap-4">
-              <label className={`flex-1 flex items-center cursor-pointer p-4 border rounded-xl transition-all backdrop-blur-sm ${formData.urgency === 'Low' ? 'bg-white/20 border-white shadow-lg' : 'bg-white/5 border-white/20 hover:border-white/50 hover:bg-white/10'}`}>
+            <div className="flex flex-col sm:flex-row gap-3">
+              <label className={`flex-1 flex items-center justify-center cursor-pointer px-4 py-3 border rounded-lg transition-all duration-200 ${formData.urgency === 'Low' ? 'bg-emerald-500/20 border-emerald-500/50 text-white shadow-lg shadow-emerald-500/10' : 'bg-white/5 border-white/20 hover:border-emerald-500/30 hover:bg-white/10 text-gray-300'}`}>
                 <input 
                   type="radio" 
                   name="urgency" 
                   value="Low"
                   checked={formData.urgency === 'Low'}
                   onChange={handleChange}
-                  className="w-4 h-4 text-white border-white/40 bg-transparent focus:ring-white focus:ring-offset-0 focus:ring-offset-transparent" 
+                  className="sr-only"
                   required
                 />
-                <span className="ml-3 font-medium text-white">Low</span>
+                <span className="font-semibold text-sm">Low</span>
+                {formData.urgency === 'Low' && <span className="ml-2 w-2 h-2 rounded-full bg-emerald-400"></span>}
               </label>
               
-              <label className={`flex-1 flex items-center cursor-pointer p-4 border rounded-xl transition-all backdrop-blur-sm ${formData.urgency === 'Medium' ? 'bg-white/20 border-white shadow-lg' : 'bg-white/5 border-white/20 hover:border-white/50 hover:bg-white/10'}`}>
+              <label className={`flex-1 flex items-center justify-center cursor-pointer px-4 py-3 border rounded-lg transition-all duration-200 ${formData.urgency === 'Medium' ? 'bg-amber-500/20 border-amber-500/50 text-white shadow-lg shadow-amber-500/10' : 'bg-white/5 border-white/20 hover:border-amber-500/30 hover:bg-white/10 text-gray-300'}`}>
                 <input 
                   type="radio" 
                   name="urgency" 
                   value="Medium"
                   checked={formData.urgency === 'Medium'}
                   onChange={handleChange}
-                  className="w-4 h-4 text-white border-white/40 bg-transparent focus:ring-white focus:ring-offset-0 focus:ring-offset-transparent" 
+                  className="sr-only"
                   required
                 />
-                <span className="ml-3 font-medium text-white">Medium</span>
+                <span className="font-semibold text-sm">Medium</span>
+                {formData.urgency === 'Medium' && <span className="ml-2 w-2 h-2 rounded-full bg-amber-400"></span>}
               </label>
               
-              <label className={`flex-1 flex items-center cursor-pointer p-4 border rounded-xl transition-all backdrop-blur-sm ${formData.urgency === 'Critical' ? 'bg-red-500/30 border-red-400 shadow-lg' : 'bg-white/5 border-white/20 hover:border-red-400/50 hover:bg-red-500/10'}`}>
+              <label className={`flex-1 flex items-center justify-center cursor-pointer px-4 py-3 border rounded-lg transition-all duration-200 ${formData.urgency === 'Critical' ? 'bg-rose-500/20 border-rose-500/50 text-white shadow-lg shadow-rose-500/10' : 'bg-white/5 border-white/20 hover:border-rose-500/30 hover:bg-white/10 text-gray-300'}`}>
                 <input 
                   type="radio" 
                   name="urgency" 
                   value="Critical"
                   checked={formData.urgency === 'Critical'}
                   onChange={handleChange}
-                  className="w-4 h-4 text-red-500 border-white/40 bg-transparent focus:ring-red-400 focus:ring-offset-0 focus:ring-offset-transparent" 
+                  className="sr-only"
                   required
                 />
-                <span className="ml-3 font-medium text-white">Critical</span>
+                <span className="font-semibold text-sm">Critical</span>
+                {formData.urgency === 'Critical' && <span className="ml-2 w-2 h-2 rounded-full bg-rose-400"></span>}
               </label>
             </div>
           </div>
 
-          {/* Photo Upload with Thumbnail Preview */}
           <div>
-            <label className="block text-sm font-medium text-gray-200 mb-3 tracking-wide">
+            <label className="text-sm font-medium text-gray-200 mb-2 block">
               Photo Upload (Optional)
             </label>
-            <div className="flex items-center gap-6">
+            <div className="flex items-center gap-5">
               <label
                 htmlFor="image-upload"
-                className="cursor-pointer group flex flex-col items-center justify-center w-32 h-32 border-2 border-dashed border-white/30 rounded-xl bg-white/5 hover:bg-white/10 hover:border-white/60 transition-all backdrop-blur-sm"
+                className="cursor-pointer group flex flex-col items-center justify-center w-28 h-28 border-2 border-dashed border-white/30 rounded-lg bg-white/5 hover:bg-white/10 hover:border-emerald-400/50 transition-all duration-200"
               >
-                <Camera className="w-8 h-8 text-white/60 group-hover:text-white mb-2 transition-colors" />
+                <Camera className="w-8 h-8 text-white/50 group-hover:text-emerald-400/80 mb-2 transition-colors" />
                 <span className="text-xs font-medium text-white/80 group-hover:text-white">Add Photo</span>
                 <input
                   id="image-upload"
@@ -334,9 +322,8 @@ const ReportForm = () => {
                 />
               </label>
 
-              {/* Thumbnail Preview */}
               {imagePreview && (
-                <div className="relative w-32 h-32 rounded-xl overflow-hidden border border-white/30 shadow-lg group">
+                <div className="relative w-28 h-28 rounded-lg overflow-hidden border border-white/20 shadow-lg group">
                   <img 
                     src={imagePreview} 
                     alt="Fault preview" 
@@ -349,34 +336,33 @@ const ReportForm = () => {
                       setFormData(prev => ({...prev, image: null}));
                       document.getElementById('image-upload').value = '';
                     }}
-                    className="absolute inset-0 bg-black/60 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity backdrop-blur-[2px]"
+                    className="absolute inset-0 bg-black/60 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
                   >
-                    <span className="text-white text-xs font-semibold border border-white/50 px-3 py-1.5 rounded-full hover:bg-white hover:text-black transition-colors">Remove</span>
+                    <span className="text-white text-xs font-semibold border border-white/50 px-3 py-1.5 rounded-md hover:bg-white hover:text-black transition-colors">Remove</span>
                   </button>
                 </div>
               )}
             </div>
           </div>
 
-          {/* Submit Button */}
-          <div className="pt-6 border-t border-white/20">
+          <div className="pt-4">
             <button
               type="submit"
               disabled={isSubmitting}
-              className="w-full flex justify-center items-center gap-3 py-4 px-6 border-2 border-transparent rounded-xl shadow-xl text-gray-900 bg-white hover:bg-gray-100 focus:outline-none focus:ring-4 focus:ring-white/30 font-bold text-lg transition-all disabled:opacity-70 disabled:cursor-not-allowed uppercase tracking-wider"
+              className="w-full py-3 bg-emerald-600 hover:bg-emerald-500 text-white font-semibold rounded-lg shadow-lg hover:shadow-emerald-500/30 transition-all duration-200 cursor-pointer flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed"
             >
               {isSubmitting ? (
                 <span className="flex items-center gap-2">
-                  <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-gray-900" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                     <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                   </svg>
-                  Submitting Report...
+                  Submitting...
                 </span>
               ) : (
                 <>
-                  <Upload size={22} />
-                  Submit Fault Report
+                  <Upload size={20} />
+                  Submit Report
                 </>
               )}
             </button>
