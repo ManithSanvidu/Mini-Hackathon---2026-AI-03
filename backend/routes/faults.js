@@ -53,6 +53,7 @@ router.post('/', async (req, res) => {
   }
 });
 
+<<<<<<< HEAD
 // @route   GET /api/faults
 // @desc    Get all fault reports
 // @access  Public
@@ -85,6 +86,29 @@ router.get('/', async (req, res) => {
   } catch (error) {
     console.error('Error in GET /api/faults:', error);
     res.status(500).json({ message: 'Internal Server Error' });
+=======
+// @route   PATCH /api/faults/:id/status
+// @desc    Update fault report status
+// @access  Public (for now)
+router.patch('/:id/status', async (req, res) => {
+  try {
+    const { status } = req.body;
+    if (!['Pending', 'In-Progress', 'Repaired'].includes(status)) {
+      return res.status(400).json({ message: 'Invalid status' });
+    }
+    const updatedReport = await FaultReport.findByIdAndUpdate(
+      req.params.id,
+      { status },
+      { new: true }
+    );
+    if (!updatedReport) {
+      return res.status(404).json({ message: 'Report not found' });
+    }
+    return res.status(200).json(updatedReport);
+  } catch (error) {
+    console.error('Error in PATCH /api/faults/:id/status:', error);
+    return res.status(500).json({ message: 'Internal Server Error' });
+>>>>>>> dewmi
   }
 });
 

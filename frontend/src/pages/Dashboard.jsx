@@ -1,6 +1,10 @@
 import { useState, useMemo, useEffect } from 'react';
 import { Search, Filter, AlertCircle, Clock, CheckCircle, FileText, RefreshCw } from 'lucide-react';
 import axios from 'axios';
+<<<<<<< HEAD
+=======
+import StatusUpdateButton from '../components/StatusUpdateButton';
+>>>>>>> dewmi
 
 const STATUS_OPTIONS = ['All', 'Pending', 'In-Progress', 'Repaired'];
 
@@ -55,6 +59,13 @@ const Dashboard = () => {
     return () => clearTimeout(timer);
   }, [statusFilter, districtFilter, searchTerm]);
 
+<<<<<<< HEAD
+=======
+  const handleStatusUpdate = (updatedFault) => {
+    setFaults(prev => prev.map(f => f._id === updatedFault._id ? updatedFault : f));
+  };
+
+>>>>>>> dewmi
   // Styling Helpers
   const getUrgencyColor = (urgency) => {
     switch (urgency) {
@@ -65,6 +76,7 @@ const Dashboard = () => {
     }
   };
 
+<<<<<<< HEAD
   const getStatusColor = (status) => {
     switch (status) {
       case 'Pending': return 'bg-amber-500/20 text-amber-400 border-amber-500/50';
@@ -74,6 +86,8 @@ const Dashboard = () => {
     }
   };
 
+=======
+>>>>>>> dewmi
   const clearFilters = () => {
     setSearchTerm('');
     setStatusFilter('All');
@@ -294,9 +308,18 @@ const Dashboard = () => {
                           </span>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
+<<<<<<< HEAD
                           <span className={`px-2.5 py-1 inline-flex text-xs leading-5 font-semibold rounded-full border backdrop-blur-sm ${getStatusColor(fault.status)}`}>
                             {fault.status === 'In-Progress' ? 'In Progress' : fault.status}
                           </span>
+=======
+                          {/* Use Dewmi's StatusUpdateButton for changing status */}
+                          <StatusUpdateButton 
+                            faultId={fault._id} 
+                            currentStatus={fault.status} 
+                            onUpdated={handleStatusUpdate} 
+                          />
+>>>>>>> dewmi
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
                           {new Date(fault.createdAt).toLocaleDateString()}

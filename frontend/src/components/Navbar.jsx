@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Menu, X, ShieldAlert } from 'lucide-react';
@@ -20,6 +21,23 @@ const Navbar = () => {
     { name: 'Report Fault', path: '/report' },
     { name: 'Dashboard', path: '/dashboard' },
   ];
+=======
+import { Link, useNavigate } from 'react-router-dom';
+import { Menu, X, ShieldAlert, LogOut, LayoutDashboard } from 'lucide-react';
+import { useState } from 'react';
+import { useAuth } from '../context/AuthContext';
+
+const Navbar = () => {
+  const [isOpen, setIsOpen] = useState(false);
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    logout();
+    setIsOpen(false);
+    navigate('/');
+  };
+>>>>>>> dewmi
 
   return (
     <nav className={`sticky top-0 z-50 w-full transition-all duration-300 bg-white ${scrolled ? 'shadow-md py-3' : 'shadow-sm py-4'}`}>
@@ -51,11 +69,77 @@ const Navbar = () => {
             })}
           </div>
 
+<<<<<<< HEAD
           {/* Desktop Auth Buttons */}
           <div className="hidden md:flex items-center space-x-4">
             <Link to="/login" className="bg-indigo-600 text-white px-6 py-2.5 rounded-full text-sm font-medium hover:bg-indigo-700 hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200">
               Login
             </Link>
+=======
+          {/* Desktop Navigation */}
+          <div className="hidden md:flex md:items-center md:space-x-8">
+            <Link to="/" className="text-white/80 hover:text-white transition font-medium text-sm">
+              Home
+            </Link>
+
+            {/* Report — visible to everyone; ProtectedRoute handles redirect if not logged in */}
+            <Link to="/report" className="text-white/80 hover:text-white transition font-medium text-sm">
+              Report a Fault
+            </Link>
+
+            {/* Officer Dashboard — only visible to Officers */}
+            {user?.role === 'Officer' && (
+              <Link
+                to="/dashboard"
+                className="flex items-center gap-1.5 text-white/80 hover:text-white transition font-medium text-sm"
+              >
+                <LayoutDashboard size={15} />
+                Officer Dashboard
+              </Link>
+            )}
+
+            {/* Auth section */}
+            {user ? (
+              <div className="flex items-center gap-3">
+                {/* Name + role badge */}
+                <div className="flex items-center gap-2">
+                  <span className="text-white/90 font-medium text-sm">{user.name}</span>
+                  <span
+                    className={`text-xs font-semibold px-2 py-0.5 rounded-full border ${
+                      user.role === 'Officer'
+                        ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40'
+                        : 'bg-blue-500/20 text-blue-300 border-blue-500/40'
+                    }`}
+                  >
+                    {user.role}
+                  </span>
+                </div>
+                <button
+                  id="navbar-logout"
+                  onClick={handleLogout}
+                  className="flex items-center gap-1.5 bg-white/10 hover:bg-white/20 border border-white/20 text-white px-4 py-2 rounded-lg text-sm font-semibold transition"
+                >
+                  <LogOut size={14} />
+                  Logout
+                </button>
+              </div>
+            ) : (
+              <div className="flex items-center gap-3">
+                <Link
+                  to="/login"
+                  className="text-white/80 hover:text-white transition font-medium text-sm"
+                >
+                  Login
+                </Link>
+                <Link
+                  to="/register"
+                  className="bg-emerald-500 hover:bg-emerald-400 text-white px-5 py-2 rounded-lg text-sm font-semibold transition shadow-lg"
+                >
+                  Register
+                </Link>
+              </div>
+            )}
+>>>>>>> dewmi
           </div>
 
           {/* Mobile menu button */}
@@ -73,6 +157,7 @@ const Navbar = () => {
 
       {/* Mobile Menu */}
       {isOpen && (
+<<<<<<< HEAD
         <div className="md:hidden bg-white border-t border-gray-100 absolute w-full shadow-xl">
           <div className="px-4 pt-2 pb-6 space-y-1 flex flex-col">
             {navLinks.map((link) => {
@@ -95,6 +180,47 @@ const Navbar = () => {
                 Login
               </Link>
             </div>
+=======
+        <div className="md:hidden mt-4 pb-2 bg-black/60 backdrop-blur-lg rounded-xl border border-white/10 overflow-hidden shadow-2xl">
+          <div className="flex flex-col">
+            <Link to="/" className="text-white/90 hover:bg-white/10 px-6 py-4 border-b border-white/5 font-medium transition" onClick={() => setIsOpen(false)}>
+              Home
+            </Link>
+            <Link to="/report" className="text-white/90 hover:bg-white/10 px-6 py-4 border-b border-white/5 font-medium transition" onClick={() => setIsOpen(false)}>
+              Report a Fault
+            </Link>
+
+            {user?.role === 'Officer' && (
+              <Link to="/dashboard" className="text-white/90 hover:bg-white/10 px-6 py-4 border-b border-white/5 font-medium transition" onClick={() => setIsOpen(false)}>
+                Officer Dashboard
+              </Link>
+            )}
+
+            {user ? (
+              <>
+                <div className="px-6 py-3 border-b border-white/5">
+                  <span className="text-white/70 text-sm">{user.name} · </span>
+                  <span className="text-emerald-400 text-sm font-semibold">{user.role}</span>
+                </div>
+                <button
+                  id="mobile-logout"
+                  onClick={handleLogout}
+                  className="text-red-400 hover:bg-white/10 px-6 py-4 font-semibold transition text-left"
+                >
+                  Logout
+                </button>
+              </>
+            ) : (
+              <>
+                <Link to="/login" className="text-white/90 hover:bg-white/10 px-6 py-4 border-b border-white/5 font-medium transition" onClick={() => setIsOpen(false)}>
+                  Login
+                </Link>
+                <Link to="/register" className="text-emerald-400 hover:bg-white/10 px-6 py-4 font-semibold transition" onClick={() => setIsOpen(false)}>
+                  Register
+                </Link>
+              </>
+            )}
+>>>>>>> dewmi
           </div>
         </div>
       )}
