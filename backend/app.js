@@ -3,8 +3,9 @@ const cors = require('cors');
 const mongoose = require('mongoose');
 const FaultReport = require('./models/FaultReport');
 const app = express();
-const origins = (process.env.CORS_ORIGINS || 'http://localhost:5173').split(',').map(s => s.trim()).filter(Boolean);
-app.use(cors({ origin: origins }));
+
+// Allow all origins to prevent CORS errors during the hackathon
+app.use(cors());
 app.use(express.json());
 // Vercel invokes this exported app directly instead of starting server.js.
 // CORS runs first so browser clients can read startup failure responses.
