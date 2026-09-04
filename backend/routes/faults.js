@@ -1,11 +1,26 @@
 const express = require('express');
 const router = express.Router();
+const mongoose = require('mongoose');
+const { authenticate, requireRole } = require('../middleware/auth');
 const FaultReport = require('../models/FaultReport');
+
+// Public map data deliberately excludes reporter contact details and photos.
+router.get('/map', async (req, res) => {
+  try {
+    const reports = await FaultReport.find({ status: { $ne: 'Repaired' } })
+      .select('_id fenceId district damageType urgency status createdAt')
+      .sort({ createdAt: -1 })
+      .lean();
+    res.json(reports);
+  } catch {
+    res.status(503).json({ message: 'Map reports are temporarily unavailable.' });
+  }
+});
 
 // @route   POST /api/faults
 // @desc    Submit a new fault report
-// @access  Public
-router.post('/', async (req, res) => {
+// @access  Authenticated
+router.post('/', authenticate, async (req, res) => {
   try {
     // Extract fields from req.body
     const { fenceId, district, damageType, urgency, phone, imageUrl } = req.body;
@@ -55,8 +70,8 @@ router.post('/', async (req, res) => {
 
 // @route   GET /api/faults
 // @desc    Get all fault reports
-// @access  Public
-router.get('/', async (req, res) => {
+// @access  Authenticated
+router.get('/', authenticate, requireRole('Officer'), async (req, res) => {
   try {
     const { status, district, search } = req.query;
     let query = {};
@@ -90,9 +105,10 @@ router.get('/', async (req, res) => {
 
 // @route   PATCH /api/faults/:id/status
 // @desc    Update fault report status
-// @access  Public (for now)
-router.patch('/:id/status', async (req, res) => {
+// @access  Officer
+router.patch('/:id/status', authenticate, requireRole('Officer'), async (req, res) => {
   try {
+    if (!mongoose.isValidObjectId(req.params.id)) return res.status(400).json({ message: 'Invalid report ID' });
     const { status } = req.body;
     if (!['Pending', 'In-Progress', 'Repaired'].includes(status)) {
       return res.status(400).json({ message: 'Invalid status' });
@@ -100,7 +116,7 @@ router.patch('/:id/status', async (req, res) => {
     const updatedReport = await FaultReport.findByIdAndUpdate(
       req.params.id,
       { status },
-      { new: true }
+      { new: true, runValidators: true }
     );
     if (!updatedReport) {
       return res.status(404).json({ message: 'Report not found' });

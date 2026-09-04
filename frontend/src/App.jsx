@@ -3,7 +3,7 @@ import { AuthProvider } from './context/AuthContext';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import ProtectedRoute from './components/ProtectedRoute';
-import Landing from './pages/Landing';
+import Home from './pages/Home';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import ReportForm from './components/ReportForm';
@@ -19,7 +19,7 @@ function App() {
           <main className="flex-grow">
             <Routes>
               {/* Public routes */}
-              <Route path="/" element={<Landing />} />
+              <Route path="/" element={<Home />} />
               <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Register />} />
 

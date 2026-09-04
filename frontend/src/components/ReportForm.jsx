@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
-import { Camera, AlertTriangle, MapPin, Hash, Phone, Upload, CheckCircle2, ShieldAlert } from 'lucide-react';
+import { useState } from 'react';
+import api from '../services/api';
+import { AlertTriangle, MapPin, Hash, Phone, Upload, CheckCircle2, ShieldAlert } from 'lucide-react';
 
 const ReportForm = () => {
   const initialFormState = {
@@ -8,24 +8,14 @@ const ReportForm = () => {
     district: '',
     damageType: '',
     urgency: '',
-    phone: '',
-    image: null
+    phone: ''
   };
 
   const [formData, setFormData] = useState(initialFormState);
   const [errors, setErrors] = useState({});
-  const [imagePreview, setImagePreview] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState(null);
 
-  // Cleanup object URL to prevent memory leaks when preview changes or component unmounts
-  useEffect(() => {
-    return () => {
-      if (imagePreview) {
-        URL.revokeObjectURL(imagePreview);
-      }
-    };
-  }, [imagePreview]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -36,27 +26,18 @@ const ReportForm = () => {
     }
   };
 
-  const handleImageChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      setFormData((prev) => ({ ...prev, image: file }));
-      // Generate a local object URL for thumbnail preview
-      const previewUrl = URL.createObjectURL(file);
-      setImagePreview(previewUrl);
-    }
-  };
 
   const validateForm = () => {
     const newErrors = {};
-    
+
     if (!formData.district) {
       newErrors.district = 'Please select a District.';
     }
-    
+
     if (!formData.damageType) {
       newErrors.damageType = 'Please select a Damage Type.';
     }
-    
+
     const phoneRegex = /^07\d{8}$/;
     if (!formData.phone || !phoneRegex.test(formData.phone)) {
       newErrors.phone = 'Please enter a valid 10-digit Sri Lankan phone number (e.g., 0712345678).';
@@ -69,7 +50,7 @@ const ReportForm = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setSubmitStatus(null);
-    
+
     if (!validateForm()) {
       return;
     }
@@ -85,62 +66,22 @@ const ReportForm = () => {
         phone: formData.phone
       };
 
-      try {
-        await axios.post('http://localhost:5001/api/faults', payload, {
-          headers: { 'Content-Type': 'application/json' }
-        });
-      } catch (err) {
-        // Ignore backend errors for MVP mock
-      }
-
-      // Save to localStorage for the map
-      const existingReports = JSON.parse(localStorage.getItem('fence_reports') || '[]');
-      
-      // Approximate coordinates based on district to show on the map
-      const districtCoords = {
-        Anuradhapura: [8.3114, 80.4168],
-        Polonnaruwa: [7.9403, 81.0188],
-        Ampara: [7.2912, 81.6724],
-        Kurunegala: [7.4818, 80.3609],
-        Hambantota: [6.1248, 81.1185],
-        Monaragala: [6.8728, 81.3507],
-        Trincomalee: [8.5874, 81.2152],
-        Other: [7.8731, 80.7718] // Center of SL
-      };
-      
-      const coords = districtCoords[formData.district] || [7.8731, 80.7718];
-      // add slight jitter so they don't perfectly overlap
-      const jitterLat = coords[0] + (Math.random() - 0.5) * 0.05;
-      const jitterLng = coords[1] + (Math.random() - 0.5) * 0.05;
-
-      const newReport = {
-        id: Date.now(),
-        ...payload,
-        lat: jitterLat,
-        lng: jitterLng,
-        timestamp: new Date().toISOString()
-      };
-      
-      existingReports.push(newReport);
-      localStorage.setItem('fence_reports', JSON.stringify(existingReports));
+      await api.post('/api/faults', payload);
 
       setSubmitStatus({
         type: 'success',
         message: 'Fault report submitted successfully. Thank you for protecting our wildlife.'
       });
-      
+
       // Reset form completely
       setFormData(initialFormState);
-      setImagePreview(null);
       setErrors({});
-      const fileInput = document.getElementById('image-upload');
-      if (fileInput) fileInput.value = '';
 
     } catch (error) {
       console.error('Submission error:', error);
       setSubmitStatus({
         type: 'error',
-        message: 'Failed to submit report. Please try again.'
+        message: error.response?.data?.message || 'Failed to submit report. Please try again.'
       });
     } finally {
       setIsSubmitting(false);
@@ -148,7 +89,7 @@ const ReportForm = () => {
   };
 
   return (
-    <div 
+    <div
       className="min-h-screen relative flex items-center justify-center pt-28 pb-12 px-4 sm:px-6 lg:px-8 bg-cover bg-center bg-no-repeat bg-fixed"
       style={{ backgroundImage: "url('https://images.unsplash.com/photo-1557050543-4d5f4e07ef46?q=80&w=2069&auto=format&fit=crop')" }}
     >
@@ -161,7 +102,7 @@ const ReportForm = () => {
           </div>
           <div>
             <h2 className="text-3xl font-serif tracking-wide text-white">Report a Fence Fault</h2>
-            <p className="text-gray-300 text-sm mt-1.5 font-sans font-light">This alerts the DWC quick-response units immediately.</p>
+            <p className="text-gray-300 text-sm mt-1.5 font-sans font-light">Your report will be available on the officer dashboard.</p>
           </div>
         </div>
 
@@ -186,7 +127,7 @@ const ReportForm = () => {
         )}
 
         <form onSubmit={handleSubmit} className="space-y-6 font-sans">
-          
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
             <div>
               <label className="text-sm font-medium text-gray-200 mb-1 block">
@@ -292,9 +233,9 @@ const ReportForm = () => {
             </label>
             <div className="flex flex-col sm:flex-row gap-3">
               <label className={`flex-1 flex items-center justify-center cursor-pointer px-4 py-3 border rounded-lg transition-all duration-200 ${formData.urgency === 'Low' ? 'bg-emerald-500/20 border-emerald-500/50 text-white shadow-lg shadow-emerald-500/10' : 'bg-white/5 border-white/20 hover:border-emerald-500/30 hover:bg-white/10 text-gray-300'}`}>
-                <input 
-                  type="radio" 
-                  name="urgency" 
+                <input
+                  type="radio"
+                  name="urgency"
                   value="Low"
                   checked={formData.urgency === 'Low'}
                   onChange={handleChange}
@@ -304,11 +245,11 @@ const ReportForm = () => {
                 <span className="font-semibold text-sm">Low</span>
                 {formData.urgency === 'Low' && <span className="ml-2 w-2 h-2 rounded-full bg-emerald-400"></span>}
               </label>
-              
+
               <label className={`flex-1 flex items-center justify-center cursor-pointer px-4 py-3 border rounded-lg transition-all duration-200 ${formData.urgency === 'Medium' ? 'bg-amber-500/20 border-amber-500/50 text-white shadow-lg shadow-amber-500/10' : 'bg-white/5 border-white/20 hover:border-amber-500/30 hover:bg-white/10 text-gray-300'}`}>
-                <input 
-                  type="radio" 
-                  name="urgency" 
+                <input
+                  type="radio"
+                  name="urgency"
                   value="Medium"
                   checked={formData.urgency === 'Medium'}
                   onChange={handleChange}
@@ -318,11 +259,11 @@ const ReportForm = () => {
                 <span className="font-semibold text-sm">Medium</span>
                 {formData.urgency === 'Medium' && <span className="ml-2 w-2 h-2 rounded-full bg-amber-400"></span>}
               </label>
-              
+
               <label className={`flex-1 flex items-center justify-center cursor-pointer px-4 py-3 border rounded-lg transition-all duration-200 ${formData.urgency === 'Critical' ? 'bg-rose-500/20 border-rose-500/50 text-white shadow-lg shadow-rose-500/10' : 'bg-white/5 border-white/20 hover:border-rose-500/30 hover:bg-white/10 text-gray-300'}`}>
-                <input 
-                  type="radio" 
-                  name="urgency" 
+                <input
+                  type="radio"
+                  name="urgency"
                   value="Critical"
                   checked={formData.urgency === 'Critical'}
                   onChange={handleChange}
@@ -332,50 +273,6 @@ const ReportForm = () => {
                 <span className="font-semibold text-sm">Critical</span>
                 {formData.urgency === 'Critical' && <span className="ml-2 w-2 h-2 rounded-full bg-rose-400"></span>}
               </label>
-            </div>
-          </div>
-
-          <div>
-            <label className="text-sm font-medium text-gray-200 mb-2 block">
-              Photo Upload (Optional)
-            </label>
-            <div className="flex items-center gap-5">
-              <label
-                htmlFor="image-upload"
-                className="cursor-pointer group flex flex-col items-center justify-center w-28 h-28 border-2 border-dashed border-white/30 rounded-lg bg-white/5 hover:bg-white/10 hover:border-emerald-400/50 transition-all duration-200"
-              >
-                <Camera className="w-8 h-8 text-white/50 group-hover:text-emerald-400/80 mb-2 transition-colors" />
-                <span className="text-xs font-medium text-white/80 group-hover:text-white">Add Photo</span>
-                <input
-                  id="image-upload"
-                  name="image"
-                  type="file"
-                  accept="image/*"
-                  className="sr-only"
-                  onChange={handleImageChange}
-                />
-              </label>
-
-              {imagePreview && (
-                <div className="relative w-28 h-28 rounded-lg overflow-hidden border border-white/20 shadow-lg group">
-                  <img 
-                    src={imagePreview} 
-                    alt="Fault preview" 
-                    className="w-full h-full object-cover"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setImagePreview(null);
-                      setFormData(prev => ({...prev, image: null}));
-                      document.getElementById('image-upload').value = '';
-                    }}
-                    className="absolute inset-0 bg-black/60 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
-                  >
-                    <span className="text-white text-xs font-semibold border border-white/50 px-3 py-1.5 rounded-md hover:bg-white hover:text-black transition-colors">Remove</span>
-                  </button>
-                </div>
-              )}
             </div>
           </div>
 

@@ -1,6 +1,6 @@
 import { useState, useMemo, useEffect } from 'react';
 import { Search, Filter, AlertCircle, Clock, CheckCircle, FileText, RefreshCw } from 'lucide-react';
-import axios from 'axios';
+import api from '../services/api';
 import StatusUpdateButton from '../components/StatusUpdateButton';
 
 const STATUS_OPTIONS = ['All', 'Pending', 'In-Progress', 'Repaired'];
@@ -27,7 +27,7 @@ const Dashboard = () => {
     setLoading(true);
     setError(null);
     try {
-      let url = 'http://localhost:5001/api/faults';
+      let url = '/api/faults';
       const params = new URLSearchParams();
       
       if (statusFilter !== 'All') params.append('status', statusFilter);
@@ -38,7 +38,7 @@ const Dashboard = () => {
         url += `?${params.toString()}`;
       }
 
-      const response = await axios.get(url);
+      const response = await api.get(url);
       setFaults(response.data);
     } catch (err) {
       console.error("Error fetching faults:", err);

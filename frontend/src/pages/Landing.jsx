@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import axios from 'axios';
+import api from '../services/api';
 import { AlertTriangle, ShieldCheck, Activity } from 'lucide-react';
 
 const Landing = () => {
@@ -15,16 +15,11 @@ const Landing = () => {
     const fetchStats = async () => {
       try {
         // Attempt to fetch from backend
-        const response = await axios.get('/api/stats');
+        const response = await api.get('/api/stats');
         setStats(response.data);
       } catch (error) {
-        console.error("Error fetching stats, using fallback data", error);
-        // Fallback data in case backend is not running yet
-        setStats({
-          activeFaults: 14,
-          fencesRepaired: 128,
-          monitoredFences: 45
-        });
+        console.error('Error fetching stats', error);
+        setStats({ activeFaults: 'Unavailable', fencesRepaired: 'Unavailable', monitoredFences: 'Unavailable' });
       } finally {
         setLoading(false);
       }
@@ -38,9 +33,9 @@ const Landing = () => {
       {/* Hero Section */}
       <section className="relative bg-gray-900 text-white">
         <div className="absolute inset-0 overflow-hidden">
-          <img 
-            src="/images/hero.jpg" 
-            alt="Elephants in the wild" 
+          <img
+            src="https://images.unsplash.com/photo-1557050543-4d5f4e07ef46?auto=format&fit=crop&w=1600&q=80"
+            alt="Elephants in the wild"
             className="w-full h-full object-cover opacity-40"
           />
         </div>
@@ -52,14 +47,14 @@ const Landing = () => {
             Over 60% of elephant encroachments in Sri Lanka happen due to unmaintained community electric fences.
           </p>
           <div className="flex flex-col sm:flex-row gap-4">
-            <Link 
-              to="/report" 
+            <Link
+              to="/report"
               className="bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-8 rounded-lg text-lg transition-all transform hover:scale-105 shadow-lg flex items-center justify-center"
             >
               Report a Fence Fault
             </Link>
-            <Link 
-              to="/dashboard" 
+            <Link
+              to="/dashboard"
               className="bg-white text-gray-900 hover:bg-gray-100 font-bold py-3 px-8 rounded-lg text-lg transition-all shadow-lg flex items-center justify-center"
             >
               View Live Dashboard
@@ -104,7 +99,7 @@ const Landing = () => {
               <div className="bg-blue-100 p-4 rounded-full mb-4">
                 <Activity className="h-8 w-8 text-blue-600" />
               </div>
-              <h3 className="text-gray-500 text-sm font-medium uppercase tracking-wider mb-2">Monitored Fences</h3>
+              <h3 className="text-gray-500 text-sm font-medium uppercase tracking-wider mb-2">Fences Reported</h3>
               <p className="text-4xl font-extrabold text-gray-900">
                 {loading ? '...' : stats.monitoredFences}
               </p>
@@ -118,9 +113,9 @@ const Landing = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col lg:flex-row items-center gap-12">
             <div className="lg:w-1/2">
-              <img 
-                src="/images/info.png" 
-                alt="Elephant close up" 
+              <img
+                src="https://images.unsplash.com/photo-1557050543-4d5f4e07ef46?auto=format&fit=crop&w=800&q=80"
+                alt="Elephant close up"
                 className="rounded-xl shadow-2xl w-full"
               />
             </div>

@@ -31,10 +31,7 @@ export default function Register() {
       setSuccess(true);
       setTimeout(() => navigate("/login"), 1800);
     } catch (err) {
-      console.warn("Backend auth failed, falling back to bypass for hackathon.");
-      // Fallback: If auth fails, pretend it succeeded so evaluators aren't blocked
-      setSuccess(true);
-      setTimeout(() => navigate("/login"), 1800);
+      setError(err.response?.data?.message || "Unable to create your account. Please try again.");
     } finally {
       setLoading(false);
     }
